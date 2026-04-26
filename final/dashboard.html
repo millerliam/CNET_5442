@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Should You Go For 2? — NFL 2pt Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root{--bg:#fafaf8;--sf:#fff;--sf2:#f3f2ee;--tx:#1a1a1a;--tx2:#6b6b6b;--tx3:#999;--bd:rgba(0,0,0,.1);--blue:#2563eb;--amber:#b45309;--teal:#0f766e;--red:#dc2626;--green:#16a34a;--green-bg:#f0fdf4;--red-bg:#fef2f2;--purple:#7c3aed;--r:10px;--rl:14px}
+  @media(prefers-color-scheme:dark){:root{--bg:#141413;--sf:#1e1e1c;--sf2:#2a2a28;--tx:#e8e8e4;--tx2:#a0a09a;--tx3:#6b6b66;--bd:rgba(255,255,255,.08);--blue:#60a5fa;--amber:#f59e0b;--teal:#2dd4bf;--red:#f87171;--green:#4ade80;--green-bg:#0f2a18;--red-bg:#2a1515;--purple:#a78bfa}}
+  *{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;padding:2rem 1rem;max-width:980px;margin:0 auto}
+  h1{font-size:28px;font-weight:600;margin-bottom:.25rem}h2{font-size:20px;font-weight:600;margin:2.5rem 0 .5rem}h3{font-size:16px;font-weight:600;margin:1.25rem 0 .4rem}
+  .sub{font-size:15px;color:var(--tx2);margin-bottom:1rem;line-height:1.5}.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:1.25rem;margin-bottom:1rem}
+  .mg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1rem 0}.m{background:var(--sf2);border-radius:var(--r);padding:1rem;text-align:center}
+  .m-l{font-size:13px;color:var(--tx2);margin-bottom:4px}.m-v{font-size:26px;font-weight:700}.m-s{font-size:12px;color:var(--tx3);margin-top:2px}
+  .cr{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;margin:.75rem 0}.cg{flex:1;min-width:140px}.cl{font-size:13px;color:var(--tx2);margin-bottom:4px;display:block}
+  .cv{display:flex;align-items:center;gap:8px}.cv input[type=range]{flex:1}.cvv{font-size:14px;font-weight:600;min-width:40px;text-align:right}
+  .tr{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}.tb{padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;border:1px solid var(--bd);background:var(--sf2);color:var(--tx2);transition:.15s}.tb.a{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .evt{width:100%;border-collapse:collapse;font-size:14px;margin:.5rem 0}.evt td{padding:8px 0}.evt tr+tr{border-top:1px solid var(--bd)}.evt td:last-child{text-align:right;font-weight:600}
+  .vd{border-radius:var(--rl);padding:1.25rem;margin:1.5rem 0}.vd.go{background:var(--green-bg)}.vd.ki{background:var(--red-bg)}.vd h3{margin:0 0 4px}.vd.go h3{color:var(--green)}.vd.ki h3{color:var(--red)}.vd p{font-size:14px}
+  .cw{position:relative;height:320px;margin:1rem 0}
+  .br{display:flex;align-items:center;gap:8px;margin:6px 0}.bl{font-size:13px;width:90px;color:var(--tx2);flex-shrink:0}.bt{flex:1;height:22px;background:var(--sf2);border-radius:4px;overflow:hidden}.bf{height:100%;border-radius:4px;transition:width .4s}.bv{font-size:13px;font-weight:600;width:80px;text-align:right;flex-shrink:0}
+  .sn{font-size:12px;color:var(--tx3);margin-top:.5rem;line-height:1.5}
+  .is{border:2px solid var(--blue);border-radius:var(--rl);padding:1.5rem;margin:2rem 0}.is h2{margin-top:0;color:var(--blue)}
+  .badge{display:inline-block;font-size:12px;background:var(--sf2);border-radius:4px;padding:2px 8px;color:var(--tx2);margin-left:8px;font-weight:400}
+  .gl{width:100%;border-collapse:collapse;font-size:12px;margin-top:.75rem}.gl th{text-align:left;padding:6px 8px;color:var(--tx2);font-weight:500;border-bottom:2px solid var(--bd);background:var(--sf2);position:sticky;top:0}.gl td{padding:5px 8px;border-bottom:1px solid var(--bd)}.gl tr:hover td{background:var(--sf2)}
+  .gl-wrap{max-height:400px;overflow-y:auto;border:1px solid var(--bd);border-radius:var(--r);margin-top:.5rem}
+  .w-tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;font-weight:600}.w-tag.win{background:#dcfce7;color:#166534}.w-tag.loss{background:#fee2e2;color:#991b1b}
+  @media(prefers-color-scheme:dark){.w-tag.win{background:#14532d;color:#86efac}.w-tag.loss{background:#450a0a;color:#fca5a5}}
+  .dl-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:1rem;margin:.5rem 0}.dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:.75rem}
+  .dl-stat{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}.dl-stat+.dl-stat{border-top:1px solid var(--bd)}
+  .yt{width:100%;border-collapse:collapse;font-size:13px}.yt th{text-align:left;padding:8px;color:var(--tx2);font-weight:500;border-bottom:2px solid var(--bd);background:var(--sf2)}.yt td{padding:6px 8px;border-bottom:1px solid var(--bd)}.yt tr:hover td{background:var(--sf2)}
+  .abox{background:var(--sf);border:2px solid var(--teal);border-radius:var(--rl);padding:1.25rem;margin:1.5rem 0}.abox h3{color:var(--teal);margin-top:0}
+  #loading{text-align:center;padding:4rem 1rem;color:var(--tx2)}#loading .sp{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--blue);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 1rem}@keyframes sp{to{transform:rotate(360deg)}}#app{display:none}
+  .fp{margin:2rem 0;padding:2rem;border:2px dashed var(--bd);border-radius:var(--rl);text-align:center}.fp label{display:inline-block;padding:10px 24px;background:var(--blue);color:#fff;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500}.fp input[type=file]{display:none}.fp p{font-size:13px;color:var(--tx2);margin-top:8px}
+  @media(max-width:600px){.mg{grid-template-columns:1fr}.cr{flex-direction:column}body{padding:1rem .75rem}}
+</style>
+</head>
+<body>
+<h1>Should you go for 2 to go up by 9?</h1>
+<p class="sub">NFL analysis using the nflfastR XGBoost WP model called directly, plus team EPA analysis from real games.</p>
+<div class="abox">
+  <h3>Two layers of analysis</h3>
+  <p style="font-size:14px;margin:0"><strong>WP Calculator:</strong> Calls the nflfastR WP model with exact inputs — score margin, time, home/away, timeouts. For an average team, what's the EV of going for 2? Always clean, always monotonic, no averaging artifacts.<br><strong>EPA Analysis:</strong> Filters actual games by team quality to see if the story changes when elite offenses or bad defenses are involved.</p>
+</div>
+
+<div id="loading"><div class="sp"></div><p>Looking for data...</p></div>
+<div class="fp" id="filePicker"><label for="fileInput">Load dashboard_data.json</label><input type="file" id="fileInput" accept=".json"/><p>Run R + Python scripts first.</p></div>
+
+<div id="app">
+
+<!-- ═══ WP CALCULATOR ═══ -->
+<h2>WP-based EV calculator</h2>
+<p class="sub">Direct from nflfastR's XGBoost model. Set the game state — only the score margin changes between the three options.</p>
+<div class="card">
+  <h3 style="margin-top:0">Conversion rates</h3>
+  <div class="cr">
+    <div class="cg"><span class="cl">2pt rate</span><div class="cv"><input type="range" min="30" max="65" value="48" step="1" id="s2pt"/><span class="cvv" id="v2pt">48%</span></div></div>
+    <div class="cg"><span class="cl">XP rate</span><div class="cv"><input type="range" min="85" max="100" value="94" step="1" id="sxp"/><span class="cvv" id="vxp">94%</span></div></div>
+  </div>
+  <h3>Game state</h3>
+  <div class="cr">
+    <div class="cg"><span class="cl">Minutes remaining</span><div class="cv"><input type="range" min="0" max="15" value="5" step=".5" id="stm"/><span class="cvv" id="vtm">5.0</span></div></div>
+    <div class="cg"><span class="cl">Venue</span><div class="tr">
+      <button class="tb venue a" data-v="0" onclick="setVenue(0)">Leading team is home</button>
+      <button class="tb venue" data-v="1" onclick="setVenue(1)">Trailing team is home</button>
+    </div></div>
+  </div>
+  <div class="cr">
+    <div class="cg"><span class="cl">Trailing team timeouts</span><div class="tr" id="trailTO">
+      <button class="tb" data-v="0" onclick="setTTO(0)">0</button><button class="tb" data-v="1" onclick="setTTO(1)">1</button>
+      <button class="tb" data-v="2" onclick="setTTO(2)">2</button><button class="tb a" data-v="3" onclick="setTTO(3)">3</button>
+    </div></div>
+    <div class="cg"><span class="cl">Leading team timeouts</span><div class="tr" id="leadTO">
+      <button class="tb" data-v="0" onclick="setLTO(0)">0</button><button class="tb" data-v="1" onclick="setLTO(1)">1</button>
+      <button class="tb" data-v="2" onclick="setLTO(2)">2</button><button class="tb a" data-v="3" onclick="setLTO(3)">3</button>
+    </div></div>
+  </div>
+  <table class="evt" id="evTbl"></table>
+  <div id="vdBox"></div>
+</div>
+
+<!-- ═══ WP CURVES ═══ -->
+<h2>WP curves over time</h2>
+<p class="sub">Leading team's WP at +7/+8/+9 from the model, for the current game state settings.</p>
+<div class="card"><div class="cw"><canvas id="wpChart"></canvas></div></div>
+
+<!-- ═══ GAP ANALYSIS ═══ -->
+<h2>WP gain by time: +7→+8 vs +8→+9</h2>
+<div class="card" id="gapCard"></div>
+
+<!-- ═══ COMEBACK TEXTURE ═══ -->
+<div class="is" style="border-color:var(--purple)">
+  <h2 style="color:var(--purple)">How close did they get? <span class="badge" id="txBadge">n=0</span></h2>
+  <p class="sub">For every game where a team trailed by 7/8/9 in Q4, we track the <strong>peak WP the trailing team reached</strong> for the rest of the game. This measures not just who won, but whether the game was ever truly in danger. Higher peak WP = the trailing team mounted a real threat.</p>
+
+  <div class="mg" id="txMetrics"></div>
+
+  <h3>Peak trailing WP distribution</h3>
+  <p class="sub">What percentage of games saw the trailing team reach various WP thresholds?</p>
+  <div id="txThresholds"></div>
+
+  <h3>Filter by team EPA</h3>
+  <div class="cr">
+    <div class="cg"><span class="cl">Trailing off EPA ≥</span><div class="cv"><input type="range" min="-.20" max=".15" value="-.20" step=".01" id="txTO"/><span class="cvv" id="txTOv">-.20</span></div></div>
+    <div class="cg"><span class="cl">Trailing def EPA ≤</span><div class="cv"><input type="range" min="-.15" max=".20" value=".20" step=".01" id="txTD"/><span class="cvv" id="txTDv">.20</span></div></div>
+  </div>
+  <div class="cr">
+    <div class="cg"><span class="cl">Leading off EPA ≥</span><div class="cv"><input type="range" min="-.20" max=".15" value="-.20" step=".01" id="txLO"/><span class="cvv" id="txLOv">-.20</span></div></div>
+    <div class="cg"><span class="cl">Leading def EPA ≤</span><div class="cv"><input type="range" min="-.15" max=".20" value=".20" step=".01" id="txLD"/><span class="cvv" id="txLDv">.20</span></div></div>
+  </div>
+  <button class="tb" onclick="resetTx()" style="margin-top:4px">Reset filters</button>
+
+  <div id="txFiltered" style="margin-top:1rem"></div>
+
+  <h3>OT rates</h3>
+  <div id="txOT"></div>
+
+  <h3 id="txLogTitle">Game log</h3>
+  <div class="gl-wrap"><table class="gl" id="txLog"></table></div>
+</div>
+
+<!-- ═══ COMEBACKS ═══ -->
+<h2>Actual comeback rates</h2>
+<p class="sub">How often the trailing team won in real games, by deficit and time.</p>
+<div class="card" id="timeCard"></div>
+
+<!-- ═══ DECISION DEEP DIVE ═══ -->
+<div class="is" style="border-color:var(--amber)">
+  <h2 style="color:var(--amber)">Post-kickoff analysis <span class="badge" id="ddBadge">n=0</span></h2>
+  <p class="sub">Every Q4 kickoff where the receiving team was down 7, 8, or 9. How close did they get to coming back? This is the exact scenario after a PAT — the trailing team gets the ball and tries to claw back.</p>
+  <div class="mg" id="ddMetrics"></div>
+  <div id="ddThresholds"></div>
+  <h3 id="ddLogTitle">Decision game log</h3>
+  <div class="gl-wrap"><table class="gl" id="ddLog"></table></div>
+</div>
+
+<!-- ═══ EPA ANALYSIS ═══ -->
+<div class="is" style="border-color:var(--green)">
+  <h2 style="color:var(--green)">EPA breakdown</h2>
+  <p class="sub">How does team quality affect comeback likelihood? Based on <strong>all Q4 kickoffs</strong> where the receiving team was down 7/8/9. Includes expected vs actual WP comparison, EPA profiles, and whether team quality changes the "go for 2" recommendation.</p>
+
+  <h3>EPA of teams that came back vs held (all Q4 kickoffs)</h3>
+  <div id="epaProfiles"></div>
+
+  <h3>Scare rates by opponent offense quality</h3>
+  <p class="sub">Above-median opponent offensive EPA vs below-median. How often did the opponent reach ≥30% WP?</p>
+  <div id="epaOffBars"></div>
+
+  <h3>Scare rates by scoring team defense quality</h3>
+  <p class="sub">Bad scoring team defense (above-median EPA allowed) vs good (below-median).</p>
+  <div id="epaDefBars"></div>
+
+  <h3>Does EPA change the decision?</h3>
+  <p class="sub">Using empirical comeback rates from EPA tiers instead of the WP model. Does the "go for 2" recommendation hold when you account for team quality?</p>
+  <div id="epaEV"></div>
+</div>
+
+<!-- ═══ DECISION LAB ═══ -->
+<div class="is" style="border-color:var(--teal)">
+  <h2 style="color:var(--teal)">PAT decision lab <span class="badge" id="dlBadge">n=0</span></h2>
+  <p class="sub">Every PAT when up 7. What teams chose vs what the model recommends using the actual game state.</p>
+  <div class="cr">
+    <div class="cg"><span class="cl">Type</span><div class="tr"><button class="tb dl-po a" data-v="all" onclick="dlPO('all')">All</button><button class="tb dl-po" data-v="0" onclick="dlPO('0')">Reg</button><button class="tb dl-po" data-v="1" onclick="dlPO('1')">Post</button></div></div>
+    <div class="cg"><span class="cl">Time</span><div class="tr"><button class="tb dl-qt a" data-v="all" onclick="dlQT('all')">All</button><button class="tb dl-qt" data-v="q4" onclick="dlQT('q4')">Q4</button><button class="tb dl-qt" data-v="late" onclick="dlQT('late')">Q4≤10</button></div></div>
+  </div>
+  <div class="dl-grid" id="dlS"></div><h3 id="dlLT">Log</h3><div class="gl-wrap"><table class="gl" id="dlL"></table></div>
+</div>
+
+<!-- ═══ RATES ═══ -->
+<h2>Historical 2pt &amp; XP rates</h2>
+<div class="card"><div class="cw" style="height:300px"><canvas id="rChart"></canvas></div><div style="overflow-x:auto;margin-top:1rem"><table class="yt" id="yTbl"></table></div></div>
+</div>
+
+<script>
+let D=null,wpC=null,rC=null,venue=0,tto=3,lto=3,dlPv='all',dlQv='all';
+const P=v=>(v*100).toFixed(1)+'%',P2=v=>(v*100).toFixed(2)+'%';
+const cs={7:'var(--blue)',8:'var(--amber)',9:'var(--teal)'};const cH={7:'#2563eb',8:'#b45309',9:'#0f766e'};
+
+document.getElementById('fileInput').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{D=JSON.parse(ev.target.result)}catch(e){alert('Bad JSON: '+e.message);return}try{boot()}catch(e){alert('Dashboard error: '+e.message);console.error(e)}};r.readAsText(f)});
+addEventListener('DOMContentLoaded',()=>{fetch('dashboard_data.json').then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{D=d;try{boot()}catch(e){alert('Dashboard error: '+e.message);console.error(e)}}).catch(()=>{document.getElementById('loading').style.display='none';document.getElementById('filePicker').style.display='block'})});
+
+function boot(){
+  document.getElementById('loading').style.display='none';document.getElementById('filePicker').style.display='none';document.getElementById('app').style.display='block';
+  const cr=D.conversion_rates;if(cr&&cr.length){const l=cr[cr.length-1];if(l.twopt_rate)document.getElementById('s2pt').value=Math.round(l.twopt_rate*100);if(l.xp_rate)document.getElementById('sxp').value=Math.round(l.xp_rate*100)}
+  updateEV();updateTx();renderDD();renderEPA();renderTimeBars();renderYT();renderRC();updateDL();
+  ['s2pt','sxp','stm'].forEach(id=>document.getElementById(id).addEventListener('input',updateEV));
+  ['txTO','txTD','txLO','txLD'].forEach(id=>document.getElementById(id).addEventListener('input',updateTx));
+}
+
+function setVenue(v){venue=v;document.querySelectorAll('.venue').forEach(b=>b.classList.toggle('a',+b.dataset.v===v));updateEV()}
+function setTTO(v){tto=v;document.querySelectorAll('#trailTO .tb').forEach(b=>b.classList.toggle('a',+b.dataset.v===v));updateEV()}
+function setLTO(v){lto=v;document.querySelectorAll('#leadTO .tb').forEach(b=>b.classList.toggle('a',+b.dataset.v===v));updateEV()}
+function dlPO(v){dlPv=v;document.querySelectorAll('.dl-po').forEach(b=>b.classList.toggle('a',b.dataset.v===v));updateDL()}
+function dlQT(v){dlQv=v;document.querySelectorAll('.dl-qt').forEach(b=>b.classList.toggle('a',b.dataset.v===v));updateDL()}
+
+// ═══ WP GRID LOOKUP ═══
+function getWP(margin, seconds, trailHome, trailTOs, leadTOs){
+  const tBin=Math.round(seconds/30)*30;
+  const row=D.wp_grid.find(r=>r.margin===margin&&r.game_seconds_remaining===tBin&&r.trailing_is_home===trailHome&&r.trailing_timeouts===trailTOs&&r.leading_timeouts===leadTOs);
+  if(row)return row.leading_wp;
+  const tLo=Math.floor(seconds/30)*30,tHi=Math.ceil(seconds/30)*30;
+  const rLo=D.wp_grid.find(r=>r.margin===margin&&r.game_seconds_remaining===tLo&&r.trailing_is_home===trailHome&&r.trailing_timeouts===trailTOs&&r.leading_timeouts===leadTOs);
+  const rHi=D.wp_grid.find(r=>r.margin===margin&&r.game_seconds_remaining===tHi&&r.trailing_is_home===trailHome&&r.trailing_timeouts===trailTOs&&r.leading_timeouts===leadTOs);
+  if(rLo&&rHi&&tHi!==tLo){const t=(seconds-tLo)/(tHi-tLo);return rLo.leading_wp+(rHi.leading_wp-rLo.leading_wp)*t}
+  return(rLo||rHi||{leading_wp:null}).leading_wp;
+}
+
+// ═══ EV CALCULATOR ═══
+function updateEV(){
+  const t2=+document.getElementById('s2pt').value/100,xr=+document.getElementById('sxp').value/100,mins=+document.getElementById('stm').value;
+  document.getElementById('v2pt').textContent=Math.round(t2*100)+'%';document.getElementById('vxp').textContent=Math.round(xr*100)+'%';document.getElementById('vtm').textContent=mins.toFixed(1);
+  const secs=mins*60,w7=getWP(7,secs,venue,tto,lto),w8=getWP(8,secs,venue,tto,lto),w9=getWP(9,secs,venue,tto,lto);
+  if(w7==null){document.getElementById('evTbl').innerHTML='<tr><td colspan=2>No data for this combo.</td></tr>';document.getElementById('vdBox').innerHTML='';return}
+  const evX=xr*w8+(1-xr)*w7,ev2=t2*w9+(1-t2)*w7,df=ev2-evX;
+  const venueLabel=venue?'trailing team home':'leading team home';
+  document.getElementById('evTbl').innerHTML=`
+    <tr><td>Leading team WP at +7</td><td>${P2(w7)}</td></tr>
+    <tr><td>Leading team WP at +8</td><td>${P2(w8)}</td></tr>
+    <tr><td>Leading team WP at +9</td><td>${P2(w9)}</td></tr>
+    <tr><td></td><td></td></tr>
+    <tr><td>EV kick XP = ${Math.round(xr*100)}%×WP(+8) + ${Math.round((1-xr)*100)}%×WP(+7)</td><td>${P2(evX)}</td></tr>
+    <tr><td>EV go for 2 = ${Math.round(t2*100)}%×WP(+9) + ${Math.round((1-t2)*100)}%×WP(+7)</td><td>${P2(ev2)}</td></tr>
+    <tr style="font-size:15px"><td>Advantage of going for 2</td><td style="color:${df>=0?'var(--green)':'var(--red)'}">${df>=0?'+':''}${(df*100).toFixed(2)} pp</td></tr>`;
+  document.getElementById('vdBox').innerHTML=df>=0
+    ?`<div class="vd go"><h3>Go for 2</h3><p>+${(df*100).toFixed(2)} pp edge. ${venueLabel}, ${mins.toFixed(1)} min left, ${tto}v${lto} TOs. Gap +7→+9 is ${((w9-w7)*100).toFixed(1)} pp vs +7→+8 of ${((w8-w7)*100).toFixed(1)} pp.</p></div>`
+    :`<div class="vd ki"><h3>Kick the XP</h3><p>Safer by ${(-df*100).toFixed(2)} pp under these conditions.</p></div>`;
+  renderWPCurve();renderGap();
+}
+
+function renderWPCurve(){
+  const dk=matchMedia('(prefers-color-scheme:dark)').matches,tc=dk?'#a0a09a':'#6b6b6b',gc=dk?'rgba(255,255,255,.05)':'rgba(0,0,0,.06)';
+  const datasets=[];
+  [7,8,9].forEach(m=>{
+    const pts=[];for(let s=0;s<=900;s+=30){const wp=getWP(m,s,venue,tto,lto);if(wp!=null)pts.push({x:s/60,y:+(wp*100).toFixed(2)})}
+    datasets.push({label:'+'+m,data:pts,borderColor:cH[m],tension:.4,pointRadius:0,borderWidth:2.5,fill:false});
+  });
+  const cv=document.getElementById('wpChart');if(wpC)wpC.destroy();
+  wpC=new Chart(cv,{type:'line',data:{datasets},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:tc},position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)+'%'}}},
+    scales:{x:{type:'linear',reverse:true,min:0,max:15,title:{display:true,text:'Minutes remaining',color:tc},ticks:{color:tc},grid:{color:gc}},
+      y:{min:50,max:100,title:{display:true,text:'Leading team WP (%)',color:tc},ticks:{color:tc,callback:v=>v+'%'},grid:{color:gc}}}}});
+}
+
+function renderGap(){
+  const bks=[[750,900,'10–15 min'],[480,600,'8–10'],[360,480,'6–8'],[240,360,'4–6'],[120,240,'2–4'],[0,120,'0–2']];
+  let html='';
+  bks.forEach(([lo,hi,lbl])=>{const mid=(lo+hi)/2,w7=getWP(7,mid,venue,tto,lto),w8=getWP(8,mid,venue,tto,lto),w9=getWP(9,mid,venue,tto,lto);
+    if(w7==null||w8==null||w9==null)return;
+    const g78=((w8-w7)*100).toFixed(1),g89=((w9-w8)*100).toFixed(1),g79=((w9-w7)*100).toFixed(1);
+    html+=`<div style="margin:.75rem 0"><strong style="font-size:14px">${lbl}</strong>
+      <div class="br"><span class="bl">+7→+8</span><div class="bt"><div class="bf" style="width:${Math.min(Math.abs(g78)/5*100,100)}%;background:var(--amber)"></div></div><span class="bv" style="color:var(--amber)">+${g78} pp</span></div>
+      <div class="br"><span class="bl">+8→+9</span><div class="bt"><div class="bf" style="width:${Math.min(Math.abs(g89)/5*100,100)}%;background:var(--teal)"></div></div><span class="bv" style="color:var(--teal)">+${g89} pp</span></div>
+      <div class="br"><span class="bl">+7→+9</span><div class="bt"><div class="bf" style="width:${Math.min(Math.abs(g79)/5*100,100)}%;background:var(--purple)"></div></div><span class="bv" style="color:var(--purple)">+${g79} pp</span></div></div>`});
+  document.getElementById('gapCard').innerHTML=html||'<p class="sn">No data.</p>';
+}
+
+// ═══ COMEBACK TEXTURE ═══
+function resetTx(){['txTO','txLO'].forEach(id=>document.getElementById(id).value=-.20);['txTD','txLD'].forEach(id=>document.getElementById(id).value=.20);updateTx()}
+
+function updateTx(){
+  if(!D.texture)return;
+  const toMin=+document.getElementById('txTO').value,tdMax=+document.getElementById('txTD').value;
+  const loMin=+document.getElementById('txLO').value,ldMax=+document.getElementById('txLD').value;
+  document.getElementById('txTOv').textContent=toMin.toFixed(2);document.getElementById('txTDv').textContent=tdMax.toFixed(2);
+  document.getElementById('txLOv').textContent=loMin.toFixed(2);document.getElementById('txLDv').textContent=ldMax.toFixed(2);
+
+  const filtered=D.texture.filter(t=>{
+    if(t.trail_off_epa==null)return false;
+    return t.trail_off_epa>=toMin&&t.trail_def_epa<=tdMax&&t.lead_off_epa>=loMin&&t.lead_def_epa<=ldMax;
+  });
+  document.getElementById('txBadge').textContent='n='+filtered.length;
+
+  // Metrics: median/mean peak WP by deficit
+  const byD={};[7,8,9].forEach(d=>{
+    const sub=filtered.filter(t=>t.deficit===d);
+    const peaks=sub.map(t=>t.peak_trailing_wp).sort((a,b)=>a-b);
+    byD[d]={
+      n:sub.length,
+      mean:sub.length?sub.reduce((s,t)=>s+t.peak_trailing_wp,0)/sub.length:0,
+      median:peaks.length?peaks[Math.floor(peaks.length/2)]:0,
+      pct50:sub.length?sub.filter(t=>t.crossed_50).length/sub.length:0,
+      pct30:sub.length?sub.filter(t=>t.crossed_30).length/sub.length:0,
+      exceeded15:sub.length?sub.filter(t=>t.exceeded_15).length/sub.length:0,
+      exceeded30:sub.length?sub.filter(t=>t.exceeded_30).length/sub.length:0,
+      ot:sub.length?sub.filter(t=>t.went_to_ot).length/sub.length:0,
+      otN:sub.filter(t=>t.went_to_ot).length,
+      won:sub.length?sub.filter(t=>t.trailing_came_back).length/sub.length:0,
+    };
+  });
+
+  // Top metrics
+  document.getElementById('txMetrics').innerHTML=[7,8,9].map(d=>{
+    const s=byD[d];
+    return`<div class="m"><div class="m-l">Down ${d} (n=${s.n})</div><div class="m-v" style="color:${cs[d]}">${P(s.median)}</div><div class="m-s">median peak trailing WP</div></div>`;
+  }).join('');
+
+  // Threshold bars
+  const thresholds=[
+    {label:'Reached 50% WP (game flipped)',key:'pct50'},
+    {label:'Reached 30% WP (real scare)',key:'pct30'},
+    {label:'Exceeded expected WP by 15+ pp',key:'exceeded15'},
+    {label:'Exceeded expected WP by 30+ pp',key:'exceeded30'},
+  ];
+  let thHtml='';
+  thresholds.forEach(th=>{
+    thHtml+=`<div style="margin:.75rem 0"><strong style="font-size:14px">${th.label}</strong>`;
+    [7,8,9].forEach(d=>{
+      const val=byD[d][th.key];
+      thHtml+=`<div class="br"><span class="bl" style="width:60px">Down ${d}</span><div class="bt"><div class="bf" style="width:${(val*100).toFixed(1)}%;background:${cs[d]}"></div></div><span class="bv" style="color:${cs[d]}">${P(val)} (${Math.round(val*byD[d].n)})</span></div>`;
+    });
+    thHtml+=`</div>`;
+  });
+  document.getElementById('txThresholds').innerHTML=thHtml;
+
+  // Filtered summary (repeats metrics but for filtered data)
+  let filtHtml=`<div style="margin:.5rem 0">`;
+  [7,8,9].forEach(d=>{
+    const s=byD[d];
+    filtHtml+=`<div style="margin:.5rem 0;padding:.75rem;background:var(--sf2);border-radius:var(--r)">
+      <strong style="color:${cs[d]}">Down ${d}</strong> (${s.n} games)
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin-top:4px">
+        <span>Mean peak WP: <strong>${P(s.mean)}</strong></span>
+        <span>Median: <strong>${P(s.median)}</strong></span>
+        <span>Came back: <strong>${P(s.won)}</strong></span>
+      </div></div>`;
+  });
+  document.getElementById('txFiltered').innerHTML=filtHtml+'</div>';
+
+  // OT rates
+  let otHtml='';
+  [7,8,9].forEach(d=>{
+    const s=byD[d];
+    otHtml+=`<div class="br"><span class="bl" style="width:60px">Down ${d}</span><div class="bt"><div class="bf" style="width:${(s.ot*100*5).toFixed(1)}%;background:${cs[d]}"></div></div><span class="bv" style="color:${cs[d]}">${P(s.ot)} (${s.otN})</span></div>`;
+  });
+  document.getElementById('txOT').innerHTML=otHtml;
+
+  // Game log
+  const sorted=[...filtered].sort((a,b)=>b.peak_trailing_wp-a.peak_trailing_wp).slice(0,200);
+  document.getElementById('txLogTitle').textContent=`Game log — sorted by peak trailing WP (${filtered.length>200?'top 200 of '+filtered.length:filtered.length})`;
+  let h='<thead><tr><th>Yr</th><th>Trail</th><th>Lead</th><th>Def</th><th>Min</th><th>Peak WP</th><th>OT</th><th>Final</th><th>Result</th></tr></thead><tbody>';
+  sorted.forEach(t=>{
+    const wpColor=t.peak_trailing_wp>=.5?'var(--green)':t.peak_trailing_wp>=.3?'var(--amber)':'var(--tx3)';
+    const result=t.trailing_came_back?'<span class="w-tag win">Comeback</span>':'<span class="w-tag loss">Held</span>';
+    h+=`<tr><td>${t.season}</td><td>${t.trailing_team}</td><td>${t.leading_team}</td><td style="font-weight:600;color:${cs[t.deficit]}">${t.deficit}</td><td>${t.minutes_left}</td><td style="font-weight:600;color:${wpColor}">${P(t.peak_trailing_wp)}</td><td>${t.went_to_ot?'OT':''}</td><td>${t.trailing_final_margin>0?'+':''}${t.trailing_final_margin}</td><td>${result}</td></tr>`;
+  });
+  document.getElementById('txLog').innerHTML=h+'</tbody>';
+}
+
+function renderTimeBars(){
+  const bt=D.comeback.by_time,L={'0-2':'0–2','2-5':'2–5','5-7':'5–7','7-10':'7–10'},bk=['7-10','5-7','2-5','0-2'];
+  const maxR=Math.max(...bt.map(r=>r.rate),.01)*1.15;
+  document.getElementById('timeCard').innerHTML=bk.map(b=>{const items=[7,8,9].map(d=>{const m=bt.find(r=>String(r.time_bucket)===b&&r.deficit===d);return{d,rate:m?m.rate:0,n:m?m.n:0}});
+    return`<div style="margin:.75rem 0"><strong style="font-size:14px">${L[b]} min</strong>${items.map(i=>`<div class="br"><span class="bl" style="width:60px">Down ${i.d}</span><div class="bt"><div class="bf" style="width:${(i.rate/maxR*100).toFixed(1)}%;background:${cs[i.d]}"></div></div><span class="bv" style="color:${cs[i.d]}">${P(i.rate)} (${i.n})</span></div>`).join('')}</div>`}).join('');
+}
+
+// ═══ DECISION DEEP DIVE ═══
+function renderDD(){
+  if(!D.texture)return;
+  const dt=D.texture;
+  document.getElementById('ddBadge').textContent='n='+dt.length;
+
+  const byM={};[7,8,9].forEach(m=>{
+    const sub=dt.filter(t=>t.deficit===m);
+    const peaks=sub.map(t=>t.peak_trailing_wp).sort((a,b)=>a-b);
+    byM[m]={
+      n:sub.length,
+      median:peaks.length?peaks[Math.floor(peaks.length/2)]:0,
+      pct50:sub.length?sub.filter(t=>t.crossed_50).length/sub.length:0,
+      pct30:sub.length?sub.filter(t=>t.crossed_30).length/sub.length:0,
+      ot:sub.filter(t=>t.went_to_ot).length,
+      came_back:sub.length?sub.filter(t=>t.trailing_came_back).length/sub.length:0,
+    };
+  });
+
+  document.getElementById('ddMetrics').innerHTML=[7,8,9].map(m=>{const s=byM[m];
+    return`<div class="m"><div class="m-l">Down ${m} (n=${s.n})</div><div class="m-v" style="color:${cs[m]}">${P(s.median)}</div><div class="m-s">median peak WP | ${P(s.came_back)} came back</div></div>`}).join('');
+
+  let thHtml='';
+  [{label:'Trailing team reached 50% WP',key:'pct50'},{label:'Trailing team reached 30% WP',key:'pct30'}].forEach(th=>{
+    thHtml+=`<div style="margin:.75rem 0"><strong style="font-size:14px">${th.label}</strong>`;
+    [7,8,9].forEach(m=>{const val=byM[m][th.key];
+      thHtml+=`<div class="br"><span class="bl" style="width:60px">Down ${m}</span><div class="bt"><div class="bf" style="width:${(val*100).toFixed(1)}%;background:${cs[m]}"></div></div><span class="bv" style="color:${cs[m]}">${P(val)} (${Math.round(val*byM[m].n)})</span></div>`;
+    });thHtml+=`</div>`;
+  });
+  document.getElementById('ddThresholds').innerHTML=thHtml;
+
+  // Game log with EPA
+  const sorted=[...dt].sort((a,b)=>b.peak_trailing_wp-a.peak_trailing_wp).slice(0,200);
+  document.getElementById('ddLogTitle').textContent=`Games sorted by peak trailing WP (${dt.length>200?'top 200 of '+dt.length:dt.length})`;
+  let h='<thead><tr><th>Yr</th><th>Trailing</th><th>Leading</th><th>Def</th><th>Min</th><th>Peak WP</th><th>OT</th><th>Result</th><th>Trail off EPA</th><th>Lead def EPA</th></tr></thead><tbody>';
+  sorted.forEach(t=>{
+    const wpC=t.peak_trailing_wp>=.5?'var(--green)':t.peak_trailing_wp>=.3?'var(--amber)':'var(--tx3)';
+    const result=t.trailing_came_back?'<span class="w-tag win">Came back</span>':'<span class="w-tag loss">Held</span>';
+    h+=`<tr><td>${t.season}</td><td>${t.trailing_team}</td><td>${t.leading_team}</td><td style="font-weight:600;color:${cs[t.deficit]}">${t.deficit}</td><td>${t.minutes_left}</td><td style="font-weight:600;color:${wpC}">${P(t.peak_trailing_wp)}</td><td>${t.went_to_ot?'OT':''}</td><td>${result}</td><td>${t.trail_off_epa!=null?t.trail_off_epa.toFixed(2):'—'}</td><td>${t.lead_def_epa!=null?t.lead_def_epa.toFixed(2):'—'}</td></tr>`;
+  });
+  document.getElementById('ddLog').innerHTML=h+'</tbody>';
+}
+
+// ═══ EPA ANALYSIS ═══
+function renderEPA(){
+  if(!D.epa_summary)return;
+  const es=D.epa_summary;
+
+  // EPA profiles by deficit from Q4 kickoffs
+  let profHtml='';
+  [7,8,9].forEach(d=>{
+    const s=es['deficit_'+d];if(!s)return;
+    const expDiff=s.expected_wp!=null&&s.actual_comeback!=null?((s.actual_comeback-s.expected_wp)*100).toFixed(1):null;
+    profHtml+=`<div style="margin:.75rem 0;padding:.75rem;background:var(--sf2);border-radius:var(--r)">
+      <strong style="color:${cs[d]}">Down ${d}</strong> (${s.n} Q4 kickoffs, avg ${s.avg_minutes_left} min left)
+      <div style="font-size:13px;margin-top:4px">
+        Comeback: <strong>${P(s.comeback_rate||0)}</strong> |
+        Scare (≥30%): <strong>${P(s.scare_rate||0)}</strong> |
+        OT: <strong>${P(s.ot_rate||0)}</strong> |
+        Median peak WP: <strong>${P(s.peak_wp_median||0)}</strong>
+      </div>
+      <div style="font-size:12px;margin-top:4px;color:var(--tx2)">
+        Model expected WP: ${s.expected_wp!=null?P(s.expected_wp):'—'} →
+        Actual comeback: ${s.actual_comeback!=null?P(s.actual_comeback):'—'}
+        ${expDiff!=null?`<strong style="color:${expDiff>=0?'var(--green)':'var(--red)'}"> (${expDiff>=0?'+':''}${expDiff} pp)</strong>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;font-size:12px">
+        <div><strong>Trailing team came back:</strong><br>Trail off EPA: ${s.cb_trail_off!=null?s.cb_trail_off.toFixed(3):'—'}<br>Trail def EPA: ${s.cb_trail_def!=null?s.cb_trail_def.toFixed(3):'—'}<br>Lead off EPA: ${s.cb_lead_off!=null?s.cb_lead_off.toFixed(3):'—'}<br>Lead def EPA: ${s.cb_lead_def!=null?s.cb_lead_def.toFixed(3):'—'}</div>
+        <div><strong>Leading team held:</strong><br>Trail off EPA: ${s.held_trail_off!=null?s.held_trail_off.toFixed(3):'—'}<br>Trail def EPA: ${s.held_trail_def!=null?s.held_trail_def.toFixed(3):'—'}<br>Lead off EPA: ${s.held_lead_off!=null?s.held_lead_off.toFixed(3):'—'}<br>Lead def EPA: ${s.held_lead_def!=null?s.held_lead_def.toFixed(3):'—'}</div>
+      </div></div>`;
+  });
+  document.getElementById('epaProfiles').innerHTML=profHtml;
+
+  // Tier bars
+  function tierBars(tierGood,tierBad,labelGood,labelBad,el){
+    const g=es[tierGood],b=es[tierBad];if(!g||!b)return;
+    let html='';
+    [{label:labelGood,data:g},{label:labelBad,data:b}].forEach(({label,data})=>{
+      html+=`<div style="margin:.75rem 0"><strong style="font-size:14px">${label}</strong>`;
+      [7,8,9].forEach(d=>{const t=data[d];if(!t)return;
+        html+=`<div class="br"><span class="bl" style="width:60px">Down ${d}</span><div class="bt"><div class="bf" style="width:${((t.scare_rate||0)*100).toFixed(1)}%;background:${cs[d]}"></div></div><span class="bv" style="color:${cs[d]}">${P(t.scare_rate||0)} scare (${t.n})</span></div>`;
+      });html+=`</div>`;
+    });
+    document.getElementById(el).innerHTML=html;
+  }
+  tierBars('good_trail_off','bad_trail_off','Good trailing offense (above median EPA)','Bad trailing offense (below median EPA)','epaOffBars');
+  tierBars('bad_lead_def','good_lead_def','Bad leading defense (above median EPA allowed)','Good leading defense (below median EPA allowed)','epaDefBars');
+
+  // EPA-adjusted EV
+  const cr=D.conversion_rates,lat=cr[cr.length-1];
+  const t2r=lat.twopt_rate||.48,xpr=lat.xp_rate||.94;
+  let evHtml='<div style="font-size:14px">';
+  for(const [tierName,label] of [['good_trail_off','Good trailing offense'],['bad_trail_off','Bad trailing offense'],['bad_lead_def','Bad leading defense'],['good_lead_def','Good leading defense']]){
+    const tier=es[tierName];if(!tier)continue;
+    const r7=tier[7]?.comeback_rate,r8=tier[8]?.comeback_rate,r9=tier[9]?.comeback_rate;
+    if(r7==null||r8==null||r9==null)continue;
+    const evXP=xpr*(1-r8)+(1-xpr)*(1-r7);
+    const ev2=t2r*(1-r9)+(1-t2r)*(1-r7);
+    const df=ev2-evXP;
+    const rec=df>=0?'<span style="color:var(--green);font-weight:600">Go for 2</span>':'<span style="color:var(--red);font-weight:600">Kick XP</span>';
+    evHtml+=`<div style="margin:.5rem 0;padding:.75rem;background:var(--sf2);border-radius:var(--r)">
+      <strong>${label}</strong>: ${rec} (${df>=0?'+':''}${(df*100).toFixed(2)} pp)
+      <span style="color:var(--tx3);font-size:12px;margin-left:8px">comeback: 7=${P(r7)}, 8=${P(r8)}, 9=${P(r9)}</span>
+    </div>`;
+  }
+  evHtml+='</div>';
+  document.getElementById('epaEV').innerHTML=evHtml;
+}
+
+function updateDL(){
+  if(!D.decisions)return;let rows=D.decisions;
+  if(dlPv!=='all')rows=rows.filter(r=>r.is_playoff===+dlPv);
+  if(dlQv==='q4')rows=rows.filter(r=>r.minutes_left<=15);if(dlQv==='late')rows=rows.filter(r=>r.minutes_left<=10);
+  document.getElementById('dlBadge').textContent='n='+rows.length;
+  const nXP=rows.filter(r=>r.chose_xp).length,n2=rows.filter(r=>r.chose_2pt).length;
+  const xpG=rows.filter(r=>r.chose_xp&&r.xp_good).length,tpG=rows.filter(r=>r.chose_2pt&&r.twopt_good).length;
+  const avg=a=>{const v=a.filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
+
+  // Model recommendation using grid WP + actual game state
+  const cr=D.conversion_rates,lat=cr[cr.length-1],t2r=lat.twopt_rate||.48,xpr=lat.xp_rate||.94;
+  let ms2=0,msX=0,mA=0,mD=0;
+  rows.forEach(r=>{
+    const secs=r.game_seconds_remaining||300;
+    // scoring_is_home_int: 1 if scoring (leading) team is home
+    // trailing_is_home is the opposite
+    const trailHome=r.scoring_is_home_int?0:1;
+    const trTOs=r.opp_tos||3;
+    const ldTOs=r.scoring_tos||3;
+    const w7=getWP(7,secs,trailHome,trTOs,ldTOs);
+    const w8=getWP(8,secs,trailHome,trTOs,ldTOs);
+    const w9=getWP(9,secs,trailHome,trTOs,ldTOs);
+    if(w7==null){r._ms2=null;return}
+    const evXP=xpr*w8+(1-xpr)*w7,ev2=t2r*w9+(1-t2r)*w7;
+    r._ms2=ev2>evXP;
+    if(r._ms2)ms2++;else msX++;
+    if((r._ms2&&r.chose_2pt)||(!r._ms2&&r.chose_xp))mA++;else mD++;
+  });
+
+  document.getElementById('dlS').innerHTML=`
+    <div class="dl-card"><strong>Choices</strong>
+      <div class="dl-stat"><span>XP</span><span>${nXP} (${P(nXP/Math.max(rows.length,1))})</span></div>
+      <div class="dl-stat"><span>2pt</span><span>${n2} (${P(n2/Math.max(rows.length,1))})</span></div>
+      <div class="dl-stat"><span>XP hit</span><span>${xpG}/${nXP}=${nXP?P(xpG/nXP):'—'}</span></div>
+      <div class="dl-stat"><span>2pt hit</span><span>${tpG}/${n2}=${n2?P(tpG/n2):'—'}</span></div></div>
+    <div class="dl-card"><strong>WP (nflfastR)</strong>
+      <div class="dl-stat"><span>Pre-PAT (+7)</span><span>${avg(rows.map(r=>r.wp_at_plus7))!=null?P(avg(rows.map(r=>r.wp_at_plus7))):'—'}</span></div>
+      <div class="dl-stat"><span>After +8</span><span>${avg(rows.filter(r=>r.chose_xp&&r.xp_good).map(r=>r.wp_after_pat))!=null?P(avg(rows.filter(r=>r.chose_xp&&r.xp_good).map(r=>r.wp_after_pat))):'—'}</span></div>
+      <div class="dl-stat"><span>After +9</span><span>${avg(rows.filter(r=>r.chose_2pt&&r.twopt_good).map(r=>r.wp_after_pat))!=null?P(avg(rows.filter(r=>r.chose_2pt&&r.twopt_good).map(r=>r.wp_after_pat))):'—'}</span></div>
+      <div class="dl-stat"><span>After miss (+7)</span><span>${avg(rows.filter(r=>(r.chose_xp&&!r.xp_good)||(r.chose_2pt&&!r.twopt_good)).map(r=>r.wp_after_pat))!=null?P(avg(rows.filter(r=>(r.chose_xp&&!r.xp_good)||(r.chose_2pt&&!r.twopt_good)).map(r=>r.wp_after_pat))):'—'}</span></div></div>
+    <div class="dl-card"><strong>Model rec (using actual game state)</strong>
+      <div class="dl-stat"><span>Go for 2</span><span>${ms2} (${rows.length?P(ms2/rows.length):'—'})</span></div>
+      <div class="dl-stat"><span>Kick XP</span><span>${msX}</span></div>
+      <div class="dl-stat"><span>Agreed</span><span>${mA} (${rows.length?P(mA/rows.length):'—'})</span></div>
+      <div class="dl-stat"><span>Disagreed</span><span>${mD}</span></div></div>`;
+
+  const sorted=[...rows].sort((a,b)=>b.season-a.season||(b.minutes_left||0)-(a.minutes_left||0)).slice(0,300);
+  document.getElementById('dlLT').textContent=`Log (${rows.length>300?'300/'+rows.length:rows.length})`;
+  let ht='<thead><tr><th>Yr</th><th>Team</th><th>Opp</th><th>Ch</th><th></th><th>+</th><th>WP pre</th><th>WP post</th><th>Min</th><th>W</th><th>Rec</th></tr></thead><tbody>';
+  sorted.forEach(r=>{const ch=r.chose_2pt?'<span style="color:var(--teal);font-weight:600">2pt</span>':'XP';const ok=r.chose_2pt?(r.twopt_good?'✓':'✗'):(r.xp_good?'✓':'✗');
+    ht+=`<tr><td>${r.season}</td><td>${r.scoring_team||''}</td><td>${r.opponent||''}</td><td>${ch}</td><td style="color:${ok==='✓'?'var(--green)':'var(--red)'}">${ok}</td><td>${r.post_pat_margin}</td><td>${r.wp_at_plus7!=null?P(r.wp_at_plus7):'—'}</td><td>${r.wp_after_pat!=null?P(r.wp_after_pat):'—'}</td><td>${(r.minutes_left||0).toFixed(1)}</td><td>${r.scoring_team_won?'<span class="w-tag win">W</span>':'<span class="w-tag loss">L</span>'}</td><td>${r._ms2!=null?(r._ms2?'<span style="color:var(--teal)">2pt</span>':'XP'):'—'}</td></tr>`});
+  document.getElementById('dlL').innerHTML=ht+'</tbody>';
+}
+
+function renderYT(){const cr=D.conversion_rates.filter(r=>r.season&&r.xp_rate!=null);let h='<thead><tr><th>Yr</th><th>XP att</th><th>Made</th><th>XP%</th><th>2pt att</th><th>Made</th><th>2pt%</th></tr></thead><tbody>';cr.forEach(r=>{h+=`<tr><td>${r.season}</td><td>${r.xp_attempts??'—'}</td><td>${r.xp_made??'—'}</td><td style="font-weight:600">${r.xp_rate!=null?P(r.xp_rate):'—'}</td><td>${r.twopt_attempts??'—'}</td><td>${r.twopt_made??'—'}</td><td style="font-weight:600">${r.twopt_rate!=null?P(r.twopt_rate):'—'}</td></tr>`});document.getElementById('yTbl').innerHTML=h+'</tbody>'}
+function renderRC(){const cr=D.conversion_rates.filter(r=>r.season&&r.xp_rate!=null);const cv=document.getElementById('rChart');if(rC)rC.destroy();const dk=matchMedia('(prefers-color-scheme:dark)').matches,tc=dk?'#a0a09a':'#6b6b6b',gc=dk?'rgba(255,255,255,.05)':'rgba(0,0,0,.06)';
+  rC=new Chart(cv,{type:'line',data:{labels:cr.map(r=>r.season),datasets:[{label:'XP%',data:cr.map(r=>r.xp_rate!=null?+(r.xp_rate*100).toFixed(1):null),borderColor:'#2563eb',tension:.3,pointRadius:3,fill:false},{label:'2pt%',data:cr.map(r=>r.twopt_rate!=null?+(r.twopt_rate*100).toFixed(1):null),borderColor:'#0f766e',tension:.3,pointRadius:3,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},scales:{y:{min:30,max:100,title:{display:true,text:'%',color:tc},ticks:{color:tc,callback:v=>v+'%'},grid:{color:gc}},x:{ticks:{color:tc,maxRotation:45},grid:{display:false}}}}})}
+</script>
+</body>
+</html>
